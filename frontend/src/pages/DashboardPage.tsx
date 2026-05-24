@@ -56,7 +56,7 @@ export const DashboardPage: React.FC = () => {
       <div className="max-w-7xl mx-auto flex flex-col gap-24">
         
         {/* Header Section */}
-        <header className="flex flex-col md:flex-row justify-between items-end gap-8 border-b-2 border-primary pb-8">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 border-b-2 border-primary pb-8">
           <div>
             <h2 className="text-xl font-medium opacity-50 mb-4">
               WELCOME BACK, {user?.name?.toUpperCase() || 'USER'}
@@ -85,7 +85,7 @@ export const DashboardPage: React.FC = () => {
               </span>
               <span className="text-2xl font-medium opacity-50">KCAL</span>
             </div>
-            <div className="mt-8 flex gap-8 border-t-2 border-primary pt-6">
+            <div className="mt-8 grid grid-cols-2 sm:flex sm:gap-8 border-t-2 border-primary pt-6 gap-y-6">
               <div className="flex flex-col">
                 <span className="font-heading text-4xl">{Math.round(summary.protein)}g</span>
                 <span className="text-xs uppercase tracking-widest opacity-50">Protein</span>
@@ -152,7 +152,7 @@ export const DashboardPage: React.FC = () => {
 
         {/* Signals and Recommendations (Printed Layout style) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-12">
-          <section className="bg-primary text-background p-12 relative overflow-hidden">
+          <section className="bg-primary text-background p-6 sm:p-12 relative overflow-hidden">
             <h3 className="text-sm uppercase tracking-widest opacity-50 mb-12">Deficiency Signals</h3>
             <div className="relative z-10">
               {deficiencies.length > 0 ? (
@@ -180,7 +180,7 @@ export const DashboardPage: React.FC = () => {
             </span>
           </section>
 
-          <section className="border-2 border-primary p-12 flex flex-col justify-between">
+          <section className="border-2 border-primary p-6 sm:p-12 flex flex-col justify-between">
             <div>
               <h3 className="text-sm uppercase tracking-widest opacity-50 mb-8">Recommendations</h3>
               {recommendations.length > 0 ? (
