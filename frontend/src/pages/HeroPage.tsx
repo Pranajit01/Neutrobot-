@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import { PageTransition } from '../components/layout/PageTransition';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Mail, ArrowUpRight } from 'lucide-react';
 
@@ -7,6 +8,7 @@ import { Mail, ArrowUpRight } from 'lucide-react';
 const TubesBackground = React.lazy(() => import('../components/ui/TubesBackground'));
 
 export const HeroPage: React.FC = () => {
+  const navigate = useNavigate();
   const handleScrollToHowItWorks = () => {
     const el = document.getElementById('how-it-works-section');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -37,7 +39,7 @@ export const HeroPage: React.FC = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center pointer-events-auto">
-              <Button onClick={() => window.location.href = '/dashboard'}>
+              <Button onClick={() => navigate('/dashboard')}>
                 Start Tracking
               </Button>
               <Button variant="secondary" onClick={handleScrollToHowItWorks}>

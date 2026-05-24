@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PageTransition } from '../components/layout/PageTransition';
 import { useAuth } from '../context/AuthContext';
 
 export const DashboardPage: React.FC = () => {
   const { authFetch, user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>({
     summary: { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
@@ -201,7 +203,7 @@ export const DashboardPage: React.FC = () => {
               )}
             </div>
             <button 
-              onClick={() => window.location.href = '/log'}
+              onClick={() => navigate('/log')}
               className="mt-12 text-left uppercase font-heading font-bold text-accent-red hover:text-primary transition-colors flex items-center gap-2"
             >
               Log A New Meal &rarr;

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PageTransition } from '../components/layout/PageTransition';
 import { useAuth } from '../context/AuthContext';
 
 export const HistoryPage: React.FC = () => {
   const { authFetch } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [logs, setLogs] = useState<any[]>([]);
 
@@ -98,7 +100,7 @@ export const HistoryPage: React.FC = () => {
               You haven't logged any nutritional entries yet. Begin tracking to construct your health archive.
             </p>
             <button
-              onClick={() => window.location.href = '/log'}
+              onClick={() => navigate('/log')}
               className="bg-primary text-background font-heading font-bold uppercase px-8 py-4 hover:bg-accent-red transition-colors"
             >
               Log Your First Intake
