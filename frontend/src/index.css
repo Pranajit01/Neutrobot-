@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-primary font-body antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading uppercase font-bold tracking-tighter leading-tighter;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #E4E2DD;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #DB4A2B;
+}
+
+/* Base Inputs */
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], textarea {
+  @apply bg-transparent border-b-2 border-primary outline-none focus:border-accent-red transition-colors placeholder-primary/50 py-2;
+}
