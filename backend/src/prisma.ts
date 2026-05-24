@@ -1,14 +1,21 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 let prismaInstance: any = null;
 try {
-  // Catch any Prisma 7 instantiation errors (e.g. missing connection adapters/options)
-  prismaInstance = new PrismaClient();
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error('DATABASE_URL is not defined in environment');
+  }
+  const pool = new Pool({ connectionString });
+  const adapter = new PrismaPg(pool);
+  prismaInstance = new PrismaClient({ adapter });
 } catch (err) {
-  console.warn('Could not instantiate PrismaClient. Database operations will fall back to memory.');
+  console.warn('Could not instantiate PrismaClient. Database operations will fall back to memory.', err);
 }
 
 export const prisma = prismaInstance;
@@ -21,7 +28,7 @@ const memFoodLogs: any[] = [];
 let isDbConnected: boolean | null = null;
 
 async function checkDbConnection() {
-  if (isDbConnected !== null) return isDbConnected;
+  if (isDbConnected === true) return true;
   if (!prismaInstance) {
     isDbConnected = false;
     return false;
@@ -30,11 +37,12 @@ async function checkDbConnection() {
     await prismaInstance.$connect();
     isDbConnected = true;
     console.log('Database connected successfully via Prisma');
+    return true;
   } catch (err) {
     console.warn('Prisma PostgreSQL connection failed. Falling back to in-memory store.');
     isDbConnected = false;
+    return false;
   }
-  return isDbConnected;
 }
 
 export const db = {

@@ -99,6 +99,29 @@ function analyzeMealLocally(query: string) {
   };
 }
 
+function sanitizeNumber(val: any, fallback: number = 0): number {
+  if (val === null || val === undefined) return fallback;
+  if (typeof val === 'number') {
+    return isNaN(val) ? fallback : val;
+  }
+  if (typeof val === 'string') {
+    const cleanStr = val.replace(/[a-zA-Z\s]+/g, '');
+    const num = parseFloat(cleanStr);
+    return isNaN(num) ? fallback : num;
+  }
+  return fallback;
+}
+
+function sanitizeStringArray(arr: any): string[] {
+  if (!Array.isArray(arr)) {
+    if (typeof arr === 'string' && arr.trim()) {
+      return [arr.trim()];
+    }
+    return [];
+  }
+  return arr.map(item => String(item).trim()).filter(Boolean);
+}
+
 router.post('/analyze', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { query } = req.body;
@@ -132,7 +155,9 @@ router.post('/analyze', authenticate, async (req: AuthRequest, res: Response) =>
         });
 
         const content = message.content[0].type === 'text' ? message.content[0].text : '';
-        jsonResponse = JSON.parse(content);
+        // Clean markdown backticks if returned by the LLM
+        const cleanContent = content.replace(/```json/g, '').replace(/```/g, '').trim();
+        jsonResponse = JSON.parse(cleanContent);
       } catch (err) {
         console.warn('External API request failed, using local parser fallback:', err);
         fallbackUsed = true;
@@ -145,16 +170,24 @@ router.post('/analyze', authenticate, async (req: AuthRequest, res: Response) =>
       jsonResponse = analyzeMealLocally(query);
     }
 
+    const rawCalories = sanitizeNumber(jsonResponse.calories, 0);
+    const rawProtein = sanitizeNumber(jsonResponse.protein, 0);
+    const rawCarbs = sanitizeNumber(jsonResponse.carbs, 0);
+    const rawFat = sanitizeNumber(jsonResponse.fat, 0);
+    const rawFiber = sanitizeNumber(jsonResponse.fiber, 0);
+    const deficiencies = sanitizeStringArray(jsonResponse.deficiencies);
+    const recommendations = sanitizeStringArray(jsonResponse.recommendations);
+
     const foodLog = await db.createFoodLog({
       userId: req.userId!,
       query,
-      calories: Math.round(jsonResponse.calories),
-      protein: Math.round(jsonResponse.protein * 10) / 10,
-      carbs: Math.round(jsonResponse.carbs * 10) / 10,
-      fat: Math.round(jsonResponse.fat * 10) / 10,
-      fiber: Math.round(jsonResponse.fiber * 10) / 10,
-      deficiencies: jsonResponse.deficiencies || [],
-      recommendations: jsonResponse.recommendations || [],
+      calories: Math.round(rawCalories),
+      protein: Math.round(rawProtein * 10) / 10,
+      carbs: Math.round(rawCarbs * 10) / 10,
+      fat: Math.round(rawFat * 10) / 10,
+      fiber: Math.round(rawFiber * 10) / 10,
+      deficiencies,
+      recommendations,
     });
 
     // Invalidate today's cache for the user
