@@ -24,6 +24,7 @@ export function TubesBackground({
   useEffect(() => {
     let mounted = true;
     let cleanup: (() => void) | undefined;
+    let autoMoveInterval: any = null;
 
     const initTubes = async () => {
       if (!canvasRef.current) return;
@@ -49,14 +50,49 @@ export function TubesBackground({
 
         tubesRef.current = app;
 
+        // Detect if user is on mobile/touch device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+          || ('ontouchstart' in window) 
+          || (navigator.maxTouchPoints > 0);
+
+        if (isMobile) {
+          let angle = 0;
+          autoMoveInterval = setInterval(() => {
+            if (!canvasRef.current) return;
+            angle += 0.012; // slow, natural speed
+            
+            // Calculate a smooth Lissajous curve path for the tubes to follow
+            const x = window.innerWidth / 2 + Math.sin(angle * 0.7) * (window.innerWidth * 0.35);
+            const y = window.innerHeight / 2 + Math.cos(angle * 1.1) * (window.innerHeight * 0.35);
+            
+            const eventConfig = {
+              clientX: x,
+              clientY: y,
+              bubbles: true
+            };
+            
+            const pEvent = new PointerEvent('pointermove', eventConfig);
+            const mEvent = new MouseEvent('mousemove', eventConfig);
+            
+            // Dispatch events to trigger the library's movement listeners
+            canvasRef.current.dispatchEvent(pEvent);
+            window.dispatchEvent(pEvent);
+            canvasRef.current.dispatchEvent(mEvent);
+            window.dispatchEvent(mEvent);
+          }, 32); // 30 FPS update rate
+        }
+
         const handleResize = () => {
-          // Typically handled by library, but matches resizing.
+          // Typically handled by library.
         };
 
         window.addEventListener('resize', handleResize);
         
         cleanup = () => {
           window.removeEventListener('resize', handleResize);
+          if (autoMoveInterval) {
+            clearInterval(autoMoveInterval);
+          }
         };
 
       } catch (error) {
@@ -75,7 +111,6 @@ export function TubesBackground({
   const handleClick = () => {
     if (!enableClickInteraction || !tubesRef.current) return;
     
-    // Spec: Clicking randomizes neon colors
     const colors = randomColors(3);
     const lightsColors = randomColors(4);
     
