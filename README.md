@@ -1,6 +1,6 @@
 # NUTROBOT — Premium Full-Stack Nutrition & Wellness Platform
 
-An editorial, premium Nutrition and Wellness tracking platform built with a **Swiss Brutalist** design system and Warm Organic Atmosphere, powered by an AI Analysis Engine.
+An editorial, premium Nutrition and Wellness tracking platform built with a **Swiss Brutalist** design system and Warm Organic Atmosphere.
 
 ---
 
@@ -28,7 +28,7 @@ An editorial, premium Nutrition and Wellness tracking platform built with a **Sw
 - **Node.js + Express + TypeScript**
 - **PostgreSQL** & **Prisma ORM**
 - **Redis** (Daily caching)
-- **Anthropic Claude API** (Natural language meal parser)
+- **Anthropic API** (Natural language meal parser)
 - **JWT Auth**
 
 ---
@@ -45,7 +45,7 @@ nutrobot/
 │   │   ├── routes/
 │   │   │   ├── auth.ts         # Login & registration
 │   │   │   ├── user.ts         # User profiles
-│   │   │   └── nutrition.ts    # Heuristic/Claude meal parser
+│   │   │   └── nutrition.ts    # Heuristic/API meal parser
 │   │   ├── prisma.ts           # Resilient database connection wrapper
 │   │   ├── redis.ts            # Resilient cache connection wrapper
 │   │   └── index.ts            # Server entry point

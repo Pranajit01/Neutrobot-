@@ -134,7 +134,7 @@ router.post('/analyze', authenticate, async (req: AuthRequest, res: Response) =>
         const content = message.content[0].type === 'text' ? message.content[0].text : '';
         jsonResponse = JSON.parse(content);
       } catch (err) {
-        console.warn('Claude API request failed, using local parser fallback:', err);
+        console.warn('External API request failed, using local parser fallback:', err);
         fallbackUsed = true;
       }
     } else {

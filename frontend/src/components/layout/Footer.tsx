@@ -12,7 +12,7 @@ export const Footer: React.FC = () => {
         <div className="flex flex-col gap-4">
           <span className="font-heading font-bold text-2xl tracking-tighter">NUTROBOT</span>
           <p className="text-sm max-w-xs opacity-70">
-            Premium AI-powered Nutrition & Wellness Platform with a Swiss Brutalist aesthetic.
+            Premium Nutrition & Wellness Platform with a Swiss Brutalist aesthetic.
           </p>
         </div>
         
