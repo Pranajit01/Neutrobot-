@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import { PageTransition } from '../components/layout/PageTransition';
 import { Button } from '../components/ui/Button';
-import { Linkedin, Mail, Instagram, ArrowUpRight } from 'lucide-react';
+import { Mail, ArrowUpRight } from 'lucide-react';
 
 // Dynamic import for the 3D background to keep initial bundle smaller
 const TubesBackground = React.lazy(() => import('../components/ui/TubesBackground'));
@@ -119,7 +119,11 @@ export const HeroPage: React.FC = () => {
             {/* LinkedIn */}
             <div className="flex justify-between items-center border-b-2 border-primary/20 pb-4">
               <div className="flex items-center gap-4">
-                <Linkedin className="w-6 h-6 text-accent-red" />
+                <svg className="w-6 h-6 text-accent-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                  <rect x="2" y="9" width="4" height="12"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
                 <span className="font-heading text-lg font-bold uppercase">LINKEDIN</span>
               </div>
               <a 
@@ -136,7 +140,11 @@ export const HeroPage: React.FC = () => {
             {/* Instagram */}
             <div className="flex justify-between items-center border-b-2 border-primary/20 pb-4">
               <div className="flex items-center gap-4">
-                <Instagram className="w-6 h-6 text-accent-orange" />
+                <svg className="w-6 h-6 text-accent-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
                 <span className="font-heading text-lg font-bold uppercase">INSTAGRAM</span>
               </div>
               <a 
