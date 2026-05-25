@@ -16,7 +16,7 @@ export const Footer: React.FC = () => {
           </p>
         </div>
         
-        <div className="flex gap-16 font-heading uppercase text-sm font-bold tracking-wider">
+        <div className="flex gap-12 sm:gap-16 font-heading uppercase text-sm font-bold tracking-wider">
           <div className="flex flex-col gap-4">
             <span className="text-accent-orange opacity-50 mb-2">Platform</span>
             {token ? (
@@ -30,6 +30,11 @@ export const Footer: React.FC = () => {
                 <Link to="/auth" className="hover:text-accent-red transition-colors">Sign In / Join</Link>
               </>
             )}
+          </div>
+          <div className="flex flex-col gap-4">
+            <span className="text-accent-orange opacity-50 mb-2">Systems</span>
+            <Link to="/about" className="hover:text-accent-red transition-colors">About</Link>
+            <Link to="/protocol" className="hover:text-accent-red transition-colors">Protocol</Link>
           </div>
           <div className="flex flex-col gap-4">
             <span className="text-accent-pink opacity-50 mb-2">Connect</span>

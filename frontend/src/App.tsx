@@ -5,12 +5,15 @@ import { AnimatePresence } from 'framer-motion';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { BackgroundBlobs } from './components/layout/BackgroundBlobs';
+import { BrutalistPreloader } from './components/ui/BrutalistPreloader';
 
 import HeroPage from './pages/HeroPage';
 import DashboardPage from './pages/DashboardPage';
 import FoodLogPage from './pages/FoodLogPage';
 import HistoryPage from './pages/HistoryPage';
 import AuthPage from './pages/AuthPage';
+import AboutPage from './pages/AboutPage';
+import ProtocolPage from './pages/ProtocolPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 const ProfilePage = () => {
@@ -94,7 +97,11 @@ const ProfilePage = () => {
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { token, isLoading } = useAuth();
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center font-heading text-4xl">LOADING SYSTEM...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center font-heading text-4xl text-accent-red">
+        SYNCHRONIZING TELEMETRY...
+      </div>
+    );
   }
   if (!token) {
     return <Navigate to="/auth" replace />;
@@ -105,7 +112,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const AuthRoute = ({ children }: { children: React.ReactNode }) => {
   const { token, isLoading } = useAuth();
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center font-heading text-4xl">LOADING SYSTEM...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center font-heading text-4xl text-accent-red">
+        SYNCHRONIZING TELEMETRY...
+      </div>
+    );
   }
   if (token) {
     return <Navigate to="/dashboard" replace />;
@@ -119,6 +130,8 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<HeroPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/protocol" element={<ProtocolPage />} />
         <Route path="/auth" element={
           <AuthRoute>
             <AuthPage />
@@ -150,14 +163,22 @@ const AnimatedRoutes = () => {
 };
 
 function App() {
+  const [isBooting, setIsBooting] = useState(true);
+
   return (
     <AuthProvider>
-      <Router>
-        <BackgroundBlobs />
-        <Navbar />
-        <AnimatedRoutes />
-        <Footer />
-      </Router>
+      <AnimatePresence mode="wait">
+        {isBooting ? (
+          <BrutalistPreloader key="preloader" onComplete={() => setIsBooting(false)} />
+        ) : (
+          <Router key="app">
+            <BackgroundBlobs />
+            <Navbar />
+            <AnimatedRoutes />
+            <Footer />
+          </Router>
+        )}
+      </AnimatePresence>
     </AuthProvider>
   );
 }

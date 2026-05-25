@@ -26,8 +26,8 @@ export const Navbar: React.FC = () => {
             </>
           ) : (
             <>
-              <a href="#how-it-works-section" className="hover:text-accent-red transition-colors">About</a>
-              <a href="#how-it-works-section" className="hover:text-accent-red transition-colors">Protocol</a>
+              <Link to="/about" className="hover:text-accent-red transition-colors">About</Link>
+              <Link to="/protocol" className="hover:text-accent-red transition-colors">Protocol</Link>
             </>
           )}
         </div>
@@ -85,9 +85,12 @@ export const Navbar: React.FC = () => {
               </>
             ) : (
               <>
-                <a href="#how-it-works-section" onClick={() => setMenuOpen(false)} className="hover:text-accent-red transition-colors">
-                  About Protocol
-                </a>
+                <Link to="/about" onClick={() => setMenuOpen(false)} className="hover:text-accent-red transition-colors">
+                  About
+                </Link>
+                <Link to="/protocol" onClick={() => setMenuOpen(false)} className="hover:text-accent-red transition-colors">
+                  Protocol
+                </Link>
                 <Link to="/auth" onClick={() => setMenuOpen(false)} className="hover:text-accent-red transition-colors text-accent-red">
                   Sign In / Join
                 </Link>
