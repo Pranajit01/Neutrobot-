@@ -1,4 +1,4 @@
-import React, { Suspense, useState, useRef } from 'react';
+import React, { Suspense, useState, useRef, useEffect } from 'react';
 import { PageTransition } from '../components/layout/PageTransition';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
@@ -102,7 +102,7 @@ const SocialLink: React.FC<SocialLinkProps> = ({ href, label, value, icon, brand
 };
 
 // Scroll-Velocity Linked Marquee Component (Smooth & Clamped)
-const ScrollMarquee: React.FC = () => {
+const ScrollMarquee: React.FC<{ isMobile?: boolean }> = ({ isMobile }) => {
   const baseX = useMotionValue(0);
   const { scrollY } = useScroll();
   const scrollVelocity = useVelocity(scrollY);
@@ -114,6 +114,7 @@ const ScrollMarquee: React.FC = () => {
   const baseSpeed = 0.025; // Super slow, elegant, readable base speed
 
   useAnimationFrame(() => {
+    if (isMobile) return;
     let moveBy = baseSpeed + velocityFactor.get();
     
     // Smooth boundary wrap for infinite scroll
@@ -130,10 +131,17 @@ const ScrollMarquee: React.FC = () => {
 
   return (
     <div className="w-full overflow-hidden bg-primary text-background py-8 border-y-4 border-primary flex whitespace-nowrap select-none font-heading text-4xl sm:text-6xl font-bold uppercase tracking-tighter relative z-20">
-      <motion.div style={{ x }} className="flex gap-16 whitespace-nowrap min-w-max">
-        <span>RECLAIM YOUR BIOLOGY • DECODE NUTRITION • SYSTEM UNLOCKED • OPTIMIZE HEALTH • NATURAL LANGUAGE ANALYSIS •</span>
-        <span>RECLAIM YOUR BIOLOGY • DECODE NUTRITION • SYSTEM UNLOCKED • OPTIMIZE HEALTH • NATURAL LANGUAGE ANALYSIS •</span>
-      </motion.div>
+      {isMobile ? (
+        <div className="flex gap-16 whitespace-nowrap min-w-max animate-marquee">
+          <span>RECLAIM YOUR BIOLOGY • DECODE NUTRITION • SYSTEM UNLOCKED • OPTIMIZE HEALTH • NATURAL LANGUAGE ANALYSIS •</span>
+          <span>RECLAIM YOUR BIOLOGY • DECODE NUTRITION • SYSTEM UNLOCKED • OPTIMIZE HEALTH • NATURAL LANGUAGE ANALYSIS •</span>
+        </div>
+      ) : (
+        <motion.div style={{ x }} className="flex gap-16 whitespace-nowrap min-w-max">
+          <span>RECLAIM YOUR BIOLOGY • DECODE NUTRITION • SYSTEM UNLOCKED • OPTIMIZE HEALTH • NATURAL LANGUAGE ANALYSIS •</span>
+          <span>RECLAIM YOUR BIOLOGY • DECODE NUTRITION • SYSTEM UNLOCKED • OPTIMIZE HEALTH • NATURAL LANGUAGE ANALYSIS •</span>
+        </motion.div>
+      )}
     </div>
   );
 };
@@ -171,6 +179,17 @@ const TelemetryScrollIndicator: React.FC = () => {
 
 export const HeroPage: React.FC = () => {
   const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const handleScrollToHowItWorks = () => {
     const el = document.getElementById('how-it-works-section');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -272,7 +291,7 @@ export const HeroPage: React.FC = () => {
       {/* Hero Section Container with 3D Stack Exit */}
       <div ref={container1Ref} className="relative w-full overflow-hidden [perspective:1200px] z-10">
         <motion.div 
-          style={{ 
+          style={isMobile ? {} : { 
             scale: springScaleHeroExit,
             opacity: springOpacityHeroExit,
             filter: springBlurHeroExit,
@@ -287,34 +306,38 @@ export const HeroPage: React.FC = () => {
           </Suspense>
 
           {/* Floating Brutalist Shapes in Background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-            <motion.div 
-              style={{ y: yPlus, rotate: rotatePlus }}
-              className="absolute top-[22%] left-[8%] w-16 h-16 flex items-center justify-center text-primary/10 text-6xl font-bold select-none"
-            >
-              +
-            </motion.div>
-            
-            <motion.div 
-              style={{ y: ySquare, rotate: rotateSquare }}
-              className="absolute top-[38%] right-[12%] w-24 h-24 border-4 border-dashed border-primary/10 select-none rounded-lg"
-            />
-            
-            <motion.div 
-              style={{ y: yCircle, scale: scaleCircle }}
-              className="absolute top-[62%] left-[15%] w-36 h-36 border-4 border-primary/10 rounded-full select-none"
-            />
+          {!isMobile && (
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+              <motion.div 
+                style={{ y: yPlus, rotate: rotatePlus }}
+                className="absolute top-[22%] left-[8%] w-16 h-16 flex items-center justify-center text-primary/10 text-6xl font-bold select-none"
+              >
+                +
+              </motion.div>
+              
+              <motion.div 
+                style={{ y: ySquare, rotate: rotateSquare }}
+                className="absolute top-[38%] right-[12%] w-24 h-24 border-4 border-dashed border-primary/10 select-none rounded-lg"
+              />
+              
+              <motion.div 
+                style={{ y: yCircle, scale: scaleCircle }}
+                className="absolute top-[62%] left-[15%] w-36 h-36 border-4 border-primary/10 rounded-full select-none"
+              />
 
-            <motion.div 
-              style={{ y: yDash, rotate: -35 }}
-              className="absolute top-[12%] right-[22%] w-28 h-5 bg-primary/10 select-none"
-            />
-          </div>
+              <motion.div 
+                style={{ y: yDash, rotate: -35 }}
+                className="absolute top-[12%] right-[22%] w-28 h-5 bg-primary/10 select-none"
+              />
+            </div>
+          )}
           
           <div className="relative z-10 flex flex-col gap-12 max-w-7xl mx-auto w-full">
-            <motion.div style={{ opacity: opacityTitle }} className="flex flex-col">
+            <motion.div style={isMobile ? {} : { opacity: opacityTitle }} className="flex flex-col">
               <motion.h1 
-                style={{ 
+                style={isMobile ? {
+                  textShadow: '4px 4px 0px #DB4A2B, 8px 8px 0px #1E1E1E'
+                } : { 
                   x: xNutro,
                   textShadow: '4px 4px 0px #DB4A2B, 8px 8px 0px #1E1E1E' 
                 }}
@@ -323,7 +346,9 @@ export const HeroPage: React.FC = () => {
                 NUTRO
               </motion.h1>
               <motion.h1 
-                style={{ 
+                style={isMobile ? {
+                  textShadow: '4px 4px 0px #1E1E1E, 8px 8px 0px #FF89A9'
+                } : { 
                   x: xBot,
                   textShadow: '4px 4px 0px #1E1E1E, 8px 8px 0px #FF89A9' 
                 }}
@@ -334,7 +359,7 @@ export const HeroPage: React.FC = () => {
             </motion.div>
 
             <motion.div 
-              style={{ y: yContent, opacity: opacityContent }}
+              style={isMobile ? {} : { y: yContent, opacity: opacityContent }}
               className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-8 mt-12 sm:ml-[15vw]"
             >
               <p className="max-w-[400px] text-lg sm:text-xl font-medium opacity-80 leading-relaxed">
@@ -357,7 +382,7 @@ export const HeroPage: React.FC = () => {
       {/* How It Works Section Container with 3D Stack Exit */}
       <div ref={container2Ref} className="relative w-full bg-[#E4E2DD] border-t-4 border-primary z-20 [perspective:1200px]">
         <motion.div 
-          style={{ 
+          style={isMobile ? {} : { 
             scale: springScaleHowItWorksExit,
             opacity: springOpacityHowItWorksExit,
             filter: springBlurHowItWorksExit,
@@ -368,7 +393,7 @@ export const HeroPage: React.FC = () => {
           className="w-full flex flex-col justify-between"
         >
           {/* Dynamic Marquee Section */}
-          <ScrollMarquee />
+          <ScrollMarquee isMobile={isMobile} />
 
           <div id="how-it-works-section" className="flex-grow flex flex-col justify-center py-32 px-6 max-w-7xl mx-auto w-full">
             <div className="flex flex-col gap-16">

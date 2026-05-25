@@ -29,3 +29,18 @@
 input[type="text"], input[type="email"], input[type="password"], input[type="number"], textarea {
   @apply bg-transparent border-b-2 border-primary outline-none focus:border-accent-red transition-colors placeholder-primary/50 py-2;
 }
+
+/* Hardware accelerated infinite marquee animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+

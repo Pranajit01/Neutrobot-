@@ -1,7 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 export const BackgroundBlobs: React.FC = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  if (isMobile) {
+    // Beautiful static radial gradient for mobile - zero performance cost, premium look
+    return (
+      <div 
+        className="fixed inset-0 overflow-hidden pointer-events-none -z-10 opacity-70" 
+        style={{
+          background: `
+            radial-gradient(circle at 15% 15%, rgba(219, 74, 43, 0.25) 0%, transparent 60%),
+            radial-gradient(circle at 85% 85%, rgba(248, 163, 72, 0.25) 0%, transparent 60%)
+          `
+        }}
+      />
+    );
+  }
+
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
       <motion.div
@@ -35,3 +61,4 @@ export const BackgroundBlobs: React.FC = () => {
     </div>
   );
 };
+

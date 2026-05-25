@@ -20,8 +20,28 @@ export function TubesBackground({
 }: TubesBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tubesRef = useRef<any>(null);
+  const [isMobile, setIsMobile] = React.useState(() => {
+    if (typeof window === 'undefined') return false;
+    const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+      || ('ontouchstart' in window) 
+      || (navigator.maxTouchPoints > 0);
+    return mobileUA || window.innerWidth < 768;
+  });
 
   useEffect(() => {
+    const checkMobile = () => {
+      const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+        || ('ontouchstart' in window) 
+        || (navigator.maxTouchPoints > 0);
+      setIsMobile(mobileUA || window.innerWidth < 768);
+    };
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return;
+
     let mounted = true;
     let cleanup: (() => void) | undefined;
     let autoMoveInterval: any = null;
@@ -121,6 +141,19 @@ export function TubesBackground({
       console.warn("Failed to set random colors on tubes:", err);
     }
   };
+
+  if (isMobile) {
+    return (
+      <div 
+        className={`absolute inset-0 w-full h-full overflow-hidden bg-transparent ${className || ''}`}
+      >
+        {/* Content Overlay */}
+        <div className="relative z-10 w-full h-full pointer-events-none">
+          {children}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 

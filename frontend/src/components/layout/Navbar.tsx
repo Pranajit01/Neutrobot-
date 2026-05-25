@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { User, LogIn, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -7,6 +7,16 @@ import { motion } from 'framer-motion';
 export const Navbar: React.FC = () => {
   const { token, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <>
@@ -14,16 +24,18 @@ export const Navbar: React.FC = () => {
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[92%] max-w-6xl z-50 rounded-full px-8 py-3.5 flex items-center justify-between bg-white/15 backdrop-blur-md border border-white/25 shadow-[inset_0_1.5px_2px_rgba(255,255,255,0.45),_inset_0_-1px_1px_rgba(0,0,0,0.1),_0_12px_24px_-4px_rgba(0,0,0,0.15)] overflow-hidden group">
         
         {/* Looping light reflection sweep (Liquid Glass effect) */}
-        <motion.div 
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 pointer-events-none z-0"
-          animate={{ translateX: ['-150%', '250%'] }}
-          transition={{ 
-            repeat: Infinity, 
-            duration: 3, 
-            repeatDelay: 5, 
-            ease: "easeInOut" 
-          }}
-        />
+        {!isMobile && (
+          <motion.div 
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 pointer-events-none z-0"
+            animate={{ translateX: ['-150%', '250%'] }}
+            transition={{ 
+              repeat: Infinity, 
+              duration: 3, 
+              repeatDelay: 5, 
+              ease: "easeInOut" 
+            }}
+          />
+        )}
 
         {/* Brand Logo (Left) */}
         <div className="w-1/3 flex justify-start relative z-10">
