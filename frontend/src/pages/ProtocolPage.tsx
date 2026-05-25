@@ -126,9 +126,9 @@ export const ProtocolPage: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* Protocols Grid */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {PROTOCOLS.map((protocol) => {
+        {/* Protocols Stack (Sticky Deck of Cards) */}
+        <section className="flex flex-col gap-12 relative pb-32">
+          {PROTOCOLS.map((protocol, index) => {
             const isActive = activeId === protocol.id;
             const isExpanded = expandedId === protocol.id;
 
@@ -136,10 +136,14 @@ export const ProtocolPage: React.FC = () => {
               <motion.div
                 key={protocol.id}
                 layout
-                className={`border-4 border-primary p-8 bg-background flex flex-col justify-between transition-all duration-300 relative ${
+                className={`sticky border-4 border-primary p-8 bg-background flex flex-col justify-between transition-all duration-300 relative ${
                   isActive ? 'shadow-[8px_8px_0px_0px_#DB4A2B]' : 'hover:shadow-[6px_6px_0px_0px_#1E1E1E]'
                 }`}
-                style={{ borderColor: isActive ? '#DB4A2B' : '#1E1E1E' }}
+                style={{ 
+                  borderColor: isActive ? '#DB4A2B' : '#1E1E1E',
+                  top: `${120 + index * 40}px`,
+                  zIndex: 10 + index
+                }}
               >
                 {/* Active Indicator Pin */}
                 {isActive && (
