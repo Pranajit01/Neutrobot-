@@ -1,11 +1,97 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import { PageTransition } from '../components/layout/PageTransition';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Mail, ArrowUpRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 // Dynamic import for the 3D background to keep initial bundle smaller
 const TubesBackground = React.lazy(() => import('../components/ui/TubesBackground'));
+
+interface SocialLinkProps {
+  href: string;
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+  brandColor: string;
+}
+
+const SocialLink: React.FC<SocialLinkProps> = ({ href, label, value, icon, brandColor }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <motion.a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      whileHover={{ 
+        y: -6, 
+        borderColor: '#1E1E1E',
+        boxShadow: '6px 6px 0px 0px #1E1E1E'
+      }}
+      whileTap={{ y: 0, boxShadow: '2px 2px 0px 0px #1E1E1E' }}
+      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+      className="relative overflow-hidden flex justify-between items-center border-2 border-transparent border-b-primary/20 py-5 px-6 bg-transparent group cursor-pointer"
+    >
+      {/* Background slide element */}
+      <motion.div 
+        className="absolute inset-0 z-0"
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: isHovered ? 1 : 0 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        style={{ 
+          backgroundColor: brandColor,
+          originX: 0 
+        }}
+      />
+      
+      {/* Left side content */}
+      <div className="relative z-10 flex items-center gap-4">
+        <motion.div 
+          animate={{ color: isHovered ? '#FFFFFF' : brandColor }}
+          transition={{ duration: 0.2 }}
+        >
+          {icon}
+        </motion.div>
+        <motion.span 
+          animate={{ color: isHovered ? '#FFFFFF' : '#1E1E1E' }}
+          className="font-heading text-lg font-bold uppercase tracking-tight"
+        >
+          {label}
+        </motion.span>
+      </div>
+      
+      {/* Right side content */}
+      <div className="relative z-10 flex items-center gap-2">
+        <motion.span 
+          animate={{ color: isHovered ? '#FFFFFF' : '#1E1E1E', x: isHovered ? -4 : 0 }}
+          className="font-medium text-sm sm:text-base opacity-90"
+        >
+          {value}
+        </motion.span>
+        
+        {/* Shooting Arrow */}
+        <motion.div
+          animate={isHovered ? {
+            x: [0, 15, -15, 0],
+            y: [0, -15, 15, 0],
+            opacity: [1, 0, 0, 1]
+          } : { x: 0, y: 0, opacity: 1 }}
+          transition={{ 
+            duration: 0.45, 
+            ease: "easeInOut",
+            times: [0, 0.4, 0.45, 1]
+          }}
+          className={isHovered ? 'text-white' : 'text-primary/75'}
+        >
+          <ArrowUpRight className="w-5 h-5" />
+        </motion.div>
+      </div>
+    </motion.a>
+  );
+};
 
 export const HeroPage: React.FC = () => {
   const navigate = useNavigate();
@@ -118,62 +204,41 @@ export const HeroPage: React.FC = () => {
           {/* Right Column - Contact Stack */}
           <div className="lg:col-span-5 flex flex-col justify-center gap-6 border-l-2 border-primary pl-0 lg:pl-12">
             
-            {/* LinkedIn */}
-            <div className="flex justify-between items-center border-b-2 border-primary/20 pb-4">
-              <div className="flex items-center gap-4">
-                <svg className="w-6 h-6 text-accent-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <SocialLink 
+              href="https://www.linkedin.com/in/pranajit-ai"
+              label="Linkedin"
+              value="pranajit-ai"
+              brandColor="#DB4A2B"
+              icon={
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
                   <rect x="2" y="9" width="4" height="12"></rect>
                   <circle cx="4" cy="4" r="2"></circle>
                 </svg>
-                <span className="font-heading text-lg font-bold uppercase">LINKEDIN</span>
-              </div>
-              <a 
-                href="https://www.linkedin.com/in/pranajit-ai" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="flex items-center gap-1 font-medium hover:text-accent-red transition-colors"
-              >
-                <span>pranajit-ai</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </a>
-            </div>
+              }
+            />
 
-            {/* Instagram */}
-            <div className="flex justify-between items-center border-b-2 border-primary/20 pb-4">
-              <div className="flex items-center gap-4">
-                <svg className="w-6 h-6 text-accent-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <SocialLink 
+              href="https://instagram.com/eccentric_pj"
+              label="Instagram"
+              value="@eccentric_pj"
+              brandColor="#F8A348"
+              icon={
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                   <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                 </svg>
-                <span className="font-heading text-lg font-bold uppercase">INSTAGRAM</span>
-              </div>
-              <a 
-                href="https://instagram.com/eccentric_pj" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="flex items-center gap-1 font-medium hover:text-accent-orange transition-colors"
-              >
-                <span>@eccentric_pj</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </a>
-            </div>
+              }
+            />
 
-            {/* Email */}
-            <div className="flex justify-between items-center pb-2">
-              <div className="flex items-center gap-4">
-                <Mail className="w-6 h-6 text-accent-pink" />
-                <span className="font-heading text-lg font-bold uppercase">EMAIL</span>
-              </div>
-              <a 
-                href="mailto:daspranajit973@gmail.com" 
-                className="flex items-center gap-1 font-medium hover:text-accent-pink transition-colors"
-              >
-                <span>daspranajit973@gmail.com</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </a>
-            </div>
+            <SocialLink 
+              href="mailto:daspranajit973@gmail.com"
+              label="Email"
+              value="daspranajit973@gmail.com"
+              brandColor="#FF89A9"
+              icon={<Mail className="w-6 h-6" />}
+            />
 
           </div>
         </div>
