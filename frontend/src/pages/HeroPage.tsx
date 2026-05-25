@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useState, useRef } from 'react';
 import { PageTransition } from '../components/layout/PageTransition';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
@@ -176,15 +176,40 @@ export const HeroPage: React.FC = () => {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Container refs for scroll animations tracking
+  const container1Ref = useRef<HTMLDivElement>(null);
+  const container2Ref = useRef<HTMLDivElement>(null);
+  const container3Ref = useRef<HTMLDivElement>(null);
+
   const { scrollY } = useScroll();
 
-  // Scroll animations values
+  // Scroll exit progress trackers for stacked layers
+  const { scrollYProgress: howItWorksExitProgress } = useScroll({
+    target: container3Ref,
+    offset: ["start end", "start start"]
+  });
+
+  // Common physics config for spring animations
   const springConfig = { damping: 25, stiffness: 100, mass: 0.5 };
   
+  // Exit transformations for Hero (moves, shrinks, blurs, and tilts slightly back in 3D space)
+  const springScaleHeroExit = useSpring(useTransform(scrollY, [0, 800], [1, 0.94]), springConfig);
+  const springOpacityHeroExit = useSpring(useTransform(scrollY, [0, 800], [1, 0.25]), springConfig);
+  const springBlurHeroExit = useSpring(useTransform(scrollY, [0, 700], ["blur(0px)", "blur(8px)"]), springConfig);
+  const springYHeroExit = useSpring(useTransform(scrollY, [0, 800], [0, 120]), springConfig);
+  const springRotateXHeroExit = useSpring(useTransform(scrollY, [0, 800], [0, -3]), springConfig);
+
+  // Exit transformations for How It Works Section
+  const springScaleHowItWorksExit = useSpring(useTransform(howItWorksExitProgress, [0, 1], [1, 0.95]), springConfig);
+  const springOpacityHowItWorksExit = useSpring(useTransform(howItWorksExitProgress, [0, 1], [1, 0.3]), springConfig);
+  const springBlurHowItWorksExit = useSpring(useTransform(howItWorksExitProgress, [0, 1], ["blur(0px)", "blur(6px)"]), springConfig);
+  const springYHowItWorksExit = useSpring(useTransform(howItWorksExitProgress, [0, 1], [0, 80]), springConfig);
+  const springRotateXHowItWorksExit = useSpring(useTransform(howItWorksExitProgress, [0, 1], [0, -2]), springConfig);
+
+  // Hero title parallax transformations (spring-smoothed)
   const xNutro = useSpring(useTransform(scrollY, [0, 600], [0, -120]), springConfig);
   const xBot = useSpring(useTransform(scrollY, [0, 600], [0, 120]), springConfig);
   const opacityTitle = useSpring(useTransform(scrollY, [0, 500], [1, 0]), springConfig);
-  const scaleHero = useSpring(useTransform(scrollY, [0, 600], [1, 0.96]), springConfig);
   
   const yContent = useSpring(useTransform(scrollY, [0, 500], [0, 40]), springConfig);
   const opacityContent = useSpring(useTransform(scrollY, [0, 450], [1, 0]), springConfig);
@@ -244,190 +269,213 @@ export const HeroPage: React.FC = () => {
     <PageTransition className="relative w-full overflow-x-hidden bg-transparent">
       <TelemetryScrollIndicator />
 
-      {/* Hero Fold (Full Viewport) */}
-      <motion.div 
-        style={{ scale: scaleHero }}
-        className="relative min-h-screen flex flex-col justify-center px-6 pt-24 pb-12 overflow-hidden z-10"
-      >
-        <Suspense fallback={null}>
-          <TubesBackground />
-        </Suspense>
+      {/* Hero Section Container with 3D Stack Exit */}
+      <div ref={container1Ref} className="relative w-full overflow-hidden [perspective:1200px] z-10">
+        <motion.div 
+          style={{ 
+            scale: springScaleHeroExit,
+            opacity: springOpacityHeroExit,
+            filter: springBlurHeroExit,
+            y: springYHeroExit,
+            rotateX: springRotateXHeroExit,
+            transformOrigin: "top center"
+          }}
+          className="relative min-h-screen flex flex-col justify-center px-6 pt-24 pb-12 overflow-hidden"
+        >
+          <Suspense fallback={null}>
+            <TubesBackground />
+          </Suspense>
 
-        {/* Floating Brutalist Shapes in Background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-          <motion.div 
-            style={{ y: yPlus, rotate: rotatePlus }}
-            className="absolute top-[22%] left-[8%] w-16 h-16 flex items-center justify-center text-primary/10 text-6xl font-bold select-none"
-          >
-            +
-          </motion.div>
-          
-          <motion.div 
-            style={{ y: ySquare, rotate: rotateSquare }}
-            className="absolute top-[38%] right-[12%] w-24 h-24 border-4 border-dashed border-primary/10 select-none rounded-lg"
-          />
-          
-          <motion.div 
-            style={{ y: yCircle, scale: scaleCircle }}
-            className="absolute top-[62%] left-[15%] w-36 h-36 border-4 border-primary/10 rounded-full select-none"
-          />
-
-          <motion.div 
-            style={{ y: yDash, rotate: -35 }}
-            className="absolute top-[12%] right-[22%] w-28 h-5 bg-primary/10 select-none"
-          />
-        </div>
-        
-        <div className="relative z-10 flex flex-col gap-12 max-w-7xl mx-auto w-full">
-          <motion.div style={{ opacity: opacityTitle }} className="flex flex-col">
-            <motion.h1 
-              style={{ 
-                x: xNutro,
-                textShadow: '4px 4px 0px #DB4A2B, 8px 8px 0px #1E1E1E' 
-              }}
-              className="text-[15vw] sm:text-[18vw] leading-tighter tracking-tighter select-none w-fit"
-            >
-              NUTRO
-            </motion.h1>
-            <motion.h1 
-              style={{ 
-                x: xBot,
-                textShadow: '4px 4px 0px #1E1E1E, 8px 8px 0px #FF89A9' 
-              }}
-              className="text-[15vw] sm:text-[18vw] leading-tighter tracking-tighter sm:ml-[15vw] text-accent-red select-none w-fit"
-            >
-              BOT
-            </motion.h1>
-          </motion.div>
-
-          <motion.div 
-            style={{ y: yContent, opacity: opacityContent }}
-            className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-8 mt-12 sm:ml-[15vw]"
-          >
-            <p className="max-w-[400px] text-lg sm:text-xl font-medium opacity-80 leading-relaxed">
-              Reclaim your biology. Advanced nutrition analysis and wellness tracking stripped of all the noise.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center pointer-events-auto">
-              <Button onClick={() => navigate('/dashboard')}>
-                Start Tracking
-              </Button>
-              <Button variant="secondary" onClick={handleScrollToHowItWorks}>
-                How it works
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Dynamic Marquee Section */}
-      <ScrollMarquee />
-
-      {/* Category Divider */}
-      <section id="how-it-works-section" className="w-full py-32 px-6 border-t-4 border-primary relative z-10 bg-[#E4E2DD]">
-        <div className="max-w-7xl mx-auto flex flex-col gap-24">
-          <div className="flex justify-between items-start">
-            <motion.h2 
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, type: "spring" }}
-              className="text-[10vw] font-heading font-bold uppercase tracking-tighter leading-none text-primary/95 select-none"
-            >
-              HOW IT WORKS
-            </motion.h2>
-            <motion.span 
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="font-heading text-lg text-accent-red font-bold uppercase tracking-widest pt-4"
-            >
-              [ PROTOCOL ]
-            </motion.span>
-          </div>
-
-          {/* Animated Line */}
-          <div className="relative w-full h-[2px] bg-primary/20 overflow-hidden">
+          {/* Floating Brutalist Shapes in Background */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
             <motion.div 
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              style={{ originX: 0 }}
-              className="absolute inset-0 bg-primary"
+              style={{ y: yPlus, rotate: rotatePlus }}
+              className="absolute top-[22%] left-[8%] w-16 h-16 flex items-center justify-center text-primary/10 text-6xl font-bold select-none"
+            >
+              +
+            </motion.div>
+            
+            <motion.div 
+              style={{ y: ySquare, rotate: rotateSquare }}
+              className="absolute top-[38%] right-[12%] w-24 h-24 border-4 border-dashed border-primary/10 select-none rounded-lg"
+            />
+            
+            <motion.div 
+              style={{ y: yCircle, scale: scaleCircle }}
+              className="absolute top-[62%] left-[15%] w-36 h-36 border-4 border-primary/10 rounded-full select-none"
+            />
+
+            <motion.div 
+              style={{ y: yDash, rotate: -35 }}
+              className="absolute top-[12%] right-[22%] w-28 h-5 bg-primary/10 select-none"
+            />
+          </div>
+          
+          <div className="relative z-10 flex flex-col gap-12 max-w-7xl mx-auto w-full">
+            <motion.div style={{ opacity: opacityTitle }} className="flex flex-col">
+              <motion.h1 
+                style={{ 
+                  x: xNutro,
+                  textShadow: '4px 4px 0px #DB4A2B, 8px 8px 0px #1E1E1E' 
+                }}
+                className="text-[15vw] sm:text-[18vw] leading-tighter tracking-tighter select-none w-fit"
+              >
+                NUTRO
+              </motion.h1>
+              <motion.h1 
+                style={{ 
+                  x: xBot,
+                  textShadow: '4px 4px 0px #1E1E1E, 8px 8px 0px #FF89A9' 
+                }}
+                className="text-[15vw] sm:text-[18vw] leading-tighter tracking-tighter sm:ml-[15vw] text-accent-red select-none w-fit"
+              >
+                BOT
+              </motion.h1>
+            </motion.div>
+
+            <motion.div 
+              style={{ y: yContent, opacity: opacityContent }}
+              className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-8 mt-12 sm:ml-[15vw]"
+            >
+              <p className="max-w-[400px] text-lg sm:text-xl font-medium opacity-80 leading-relaxed">
+                Reclaim your biology. Advanced nutrition analysis and wellness tracking stripped of all the noise.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center pointer-events-auto">
+                <Button onClick={() => navigate('/dashboard')}>
+                  Start Tracking
+                </Button>
+                <Button variant="secondary" onClick={handleScrollToHowItWorks}>
+                  How it works
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* How It Works Section Container with 3D Stack Exit */}
+      <div ref={container2Ref} className="relative w-full bg-[#E4E2DD] border-t-4 border-primary z-20 [perspective:1200px]">
+        <motion.div 
+          style={{ 
+            scale: springScaleHowItWorksExit,
+            opacity: springOpacityHowItWorksExit,
+            filter: springBlurHowItWorksExit,
+            y: springYHowItWorksExit,
+            rotateX: springRotateXHowItWorksExit,
+            transformOrigin: "top center"
+          }}
+          className="w-full flex flex-col justify-between"
+        >
+          {/* Dynamic Marquee Section */}
+          <ScrollMarquee />
+
+          <div id="how-it-works-section" className="flex-grow flex flex-col justify-center py-32 px-6 max-w-7xl mx-auto w-full">
+            <div className="flex flex-col gap-16">
+              <div className="flex justify-between items-start">
+                <motion.h2 
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, type: "spring" }}
+                  className="text-[10vw] font-heading font-bold uppercase tracking-tighter leading-none text-primary/95 select-none"
+                >
+                  HOW IT WORKS
+                </motion.h2>
+                <motion.span 
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="font-heading text-lg text-accent-red font-bold uppercase tracking-widest pt-4"
+                >
+                  [ PROTOCOL ]
+                </motion.span>
+              </div>
+
+              {/* Animated Line */}
+              <div className="relative w-full h-[2px] bg-primary/20 overflow-hidden">
+                <motion.div 
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  style={{ originX: 0 }}
+                  className="absolute inset-0 bg-primary"
                 />
+              </div>
+
+              {/* 4 Step Process Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-10">
+                
+                <motion.div 
+                  custom={0}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-100px" }}
+                  className="flex flex-col gap-6 border-2 border-primary p-6 bg-[#eae8e3]/60 backdrop-blur-sm shadow-[4px_4px_0px_0px_#1E1E1E] hover:shadow-[8px_8px_0px_0px_#1E1E1E] hover:-translate-y-1.5 transition-all duration-300"
+                >
+                  <span className="font-heading text-4xl text-accent-red">01</span>
+                  <h3 className="font-heading text-xl font-bold tracking-tight">ACCESS</h3>
+                  <p className="text-sm font-medium opacity-75 leading-relaxed">
+                    Configure your credential token. Create your user account to initialize your personal tracking matrix.
+                  </p>
+                </motion.div>
+
+                <motion.div 
+                  custom={1}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-100px" }}
+                  className="flex flex-col gap-6 border-2 border-primary p-6 bg-[#eae8e3]/60 backdrop-blur-sm shadow-[4px_4px_0px_0px_#1E1E1E] hover:shadow-[8px_8px_0px_0px_#1E1E1E] hover:-translate-y-1.5 transition-all duration-300"
+                >
+                  <span className="font-heading text-4xl text-accent-orange">02</span>
+                  <h3 className="font-heading text-xl font-bold tracking-tight">LOG MEALS</h3>
+                  <p className="text-sm font-medium opacity-75 leading-relaxed">
+                    Describe your food log in natural language. Type what you ate without parsing columns or portions manually.
+                  </p>
+                </motion.div>
+
+                <motion.div 
+                  custom={2}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-100px" }}
+                  className="flex flex-col gap-6 border-2 border-primary p-6 bg-[#eae8e3]/60 backdrop-blur-sm shadow-[4px_4px_0px_0px_#1E1E1E] hover:shadow-[8px_8px_0px_0px_#1E1E1E] hover:-translate-y-1.5 transition-all duration-300"
+                >
+                  <span className="font-heading text-4xl text-accent-pink">03</span>
+                  <h3 className="font-heading text-xl font-bold tracking-tight">ANALYSIS</h3>
+                  <p className="text-sm font-medium opacity-75 leading-relaxed">
+                    The engine breaks down total calories, protein, carbs, fats, and fiber, evaluating biological markers.
+                  </p>
+                </motion.div>
+
+                <motion.div 
+                  custom={3}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-100px" }}
+                  className="flex flex-col gap-6 border-2 border-primary p-6 bg-[#eae8e3]/60 backdrop-blur-sm shadow-[4px_4px_0px_0px_#1E1E1E] hover:shadow-[8px_8px_0px_0px_#1E1E1E] hover:-translate-y-1.5 transition-all duration-300"
+                >
+                  <span className="font-heading text-4xl text-primary">04</span>
+                  <h3 className="font-heading text-xl font-bold tracking-tight">OPTIMIZE</h3>
+                  <p className="text-sm font-medium opacity-75 leading-relaxed">
+                    Receive specific deficiency warnings and personalized recommendations to restore system balance.
+                  </p>
+                </motion.div>
+
+              </div>
+            </div>
           </div>
-
-          {/* 4 Step Process Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-10">
-            
-            <motion.div 
-              custom={0}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              className="flex flex-col gap-6 border-2 border-primary p-6 bg-[#eae8e3]/60 backdrop-blur-sm shadow-[4px_4px_0px_0px_#1E1E1E] hover:shadow-[8px_8px_0px_0px_#1E1E1E] hover:-translate-y-1.5 transition-all duration-300"
-            >
-              <span className="font-heading text-4xl text-accent-red">01</span>
-              <h3 className="font-heading text-xl font-bold tracking-tight">ACCESS</h3>
-              <p className="text-sm font-medium opacity-75 leading-relaxed">
-                Configure your credential token. Create your user account to initialize your personal tracking matrix.
-              </p>
-            </motion.div>
-
-            <motion.div 
-              custom={1}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              className="flex flex-col gap-6 border-2 border-primary p-6 bg-[#eae8e3]/60 backdrop-blur-sm shadow-[4px_4px_0px_0px_#1E1E1E] hover:shadow-[8px_8px_0px_0px_#1E1E1E] hover:-translate-y-1.5 transition-all duration-300"
-            >
-              <span className="font-heading text-4xl text-accent-orange">02</span>
-              <h3 className="font-heading text-xl font-bold tracking-tight">LOG MEALS</h3>
-              <p className="text-sm font-medium opacity-75 leading-relaxed">
-                Describe your food log in natural language. Type what you ate without parsing columns or portions manually.
-              </p>
-            </motion.div>
-
-            <motion.div 
-              custom={2}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              className="flex flex-col gap-6 border-2 border-primary p-6 bg-[#eae8e3]/60 backdrop-blur-sm shadow-[4px_4px_0px_0px_#1E1E1E] hover:shadow-[8px_8px_0px_0px_#1E1E1E] hover:-translate-y-1.5 transition-all duration-300"
-            >
-              <span className="font-heading text-4xl text-accent-pink">03</span>
-              <h3 className="font-heading text-xl font-bold tracking-tight">ANALYSIS</h3>
-              <p className="text-sm font-medium opacity-75 leading-relaxed">
-                The engine breaks down total calories, protein, carbs, fats, and fiber, evaluating biological markers.
-              </p>
-            </motion.div>
-
-            <motion.div 
-              custom={3}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              className="flex flex-col gap-6 border-2 border-primary p-6 bg-[#eae8e3]/60 backdrop-blur-sm shadow-[4px_4px_0px_0px_#1E1E1E] hover:shadow-[8px_8px_0px_0px_#1E1E1E] hover:-translate-y-1.5 transition-all duration-300"
-            >
-              <span className="font-heading text-4xl text-primary">04</span>
-              <h3 className="font-heading text-xl font-bold tracking-tight">OPTIMIZE</h3>
-              <p className="text-sm font-medium opacity-75 leading-relaxed">
-                Receive specific deficiency warnings and personalized recommendations to restore system balance.
-              </p>
-            </motion.div>
-
-          </div>
-        </div>
-      </section>
+        </motion.div>
+      </div>
 
       {/* Campaign Connect Block */}
-      <section className="w-full bg-[#D9D6D0] py-32 px-6 border-t-4 border-primary relative z-10">
+      <div ref={container3Ref} className="relative w-full bg-[#D9D6D0] py-32 px-6 border-t-4 border-primary z-30">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 w-full">
           
           {/* Left Column - Large Editorial Header */}
@@ -504,7 +552,7 @@ export const HeroPage: React.FC = () => {
 
           </motion.div>
         </div>
-      </section>
+      </div>
 
     </PageTransition>
   );
