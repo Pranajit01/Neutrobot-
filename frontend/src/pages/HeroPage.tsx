@@ -109,9 +109,9 @@ const ScrollMarquee: React.FC = () => {
   const smoothVelocity = useSpring(scrollVelocity, { damping: 60, stiffness: 300 });
   
   // Clamp speed variations to keep text perfectly legible and slow down chaotic fast scrolls
-  const velocityFactor = useTransform(smoothVelocity, [-1500, 1500], [-3, 3]);
+  const velocityFactor = useTransform(smoothVelocity, [-1500, 1500], [-0.08, 0.08]);
   
-  const baseSpeed = 0.08; // Safe, elegant base speed
+  const baseSpeed = 0.025; // Super slow, elegant, readable base speed
 
   useAnimationFrame(() => {
     let moveBy = baseSpeed + velocityFactor.get();
