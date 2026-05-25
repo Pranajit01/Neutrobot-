@@ -38,10 +38,7 @@ services:
         value: no-cache
     envVars:
       - key: VITE_API_URL
-        fromService:
-          name: nutrobot-backend
-          type: web
-          property: url
+        sync: false # You will enter the public URL of your backend (e.g., https://nutrobot-backend.onrender.com/api)
 
   # 3. Redis Cache Instance
   - type: redis
