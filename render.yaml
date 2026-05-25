@@ -27,13 +27,14 @@ services:
   # 2. Frontend Static Site
   - type: web
     name: nutrobot-frontend
-    env: static
+    runtime: static
     plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
-    publishPath: dist
+    staticPublishPath: dist
     headers:
-      - key: Cache-Control
+      - path: /*
+        name: Cache-Control
         value: no-cache
     envVars:
       - key: VITE_API_URL
