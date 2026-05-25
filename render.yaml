@@ -5,8 +5,8 @@ services:
     env: node
     plan: free
     rootDir: backend
-    buildCommand: npm install && npx prisma generate
-    startCommand: npm run dev # For tsx runtime, or npm run build if transpiling
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
     envVars:
       - key: PORT
         value: 5001
