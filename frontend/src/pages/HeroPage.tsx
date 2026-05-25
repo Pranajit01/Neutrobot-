@@ -111,10 +111,16 @@ export const HeroPage: React.FC = () => {
         
         <div className="relative z-10 flex flex-col gap-12 max-w-7xl mx-auto w-full">
           <div className="flex flex-col">
-            <h1 className="text-[15vw] sm:text-[18vw] leading-tighter tracking-tighter select-none">
+            <h1 
+              style={{ textShadow: '4px 4px 0px #DB4A2B, 8px 8px 0px #1E1E1E' }}
+              className="text-[15vw] sm:text-[18vw] leading-tighter tracking-tighter select-none"
+            >
               NUTRO
             </h1>
-            <h1 className="text-[15vw] sm:text-[18vw] leading-tighter tracking-tighter sm:ml-[15vw] text-accent-red select-none">
+            <h1 
+              style={{ textShadow: '4px 4px 0px #1E1E1E, 8px 8px 0px #FF89A9' }}
+              className="text-[15vw] sm:text-[18vw] leading-tighter tracking-tighter sm:ml-[15vw] text-accent-red select-none"
+            >
               BOT
             </h1>
           </div>

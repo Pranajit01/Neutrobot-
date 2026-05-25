@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { User, LogIn, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { motion } from 'framer-motion';
 
 export const Navbar: React.FC = () => {
   const { token, logout } = useAuth();
@@ -9,15 +10,30 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-6 mix-blend-difference sm:mix-blend-normal">
-        <div className="w-1/3 flex justify-start">
-          <Link to="/" className="font-heading font-bold text-2xl tracking-tighter sm:text-primary text-background mix-blend-difference sm:mix-blend-normal hover:text-accent-red transition-colors">
+      {/* Floating iOS-style Liquid Glass Navbar */}
+      <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[92%] max-w-6xl z-50 rounded-full px-8 py-3.5 flex items-center justify-between bg-white/15 backdrop-blur-md border border-white/25 shadow-[inset_0_1.5px_2px_rgba(255,255,255,0.45),_inset_0_-1px_1px_rgba(0,0,0,0.1),_0_12px_24px_-4px_rgba(0,0,0,0.15)] overflow-hidden group">
+        
+        {/* Looping light reflection sweep (Liquid Glass effect) */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 pointer-events-none z-0"
+          animate={{ translateX: ['-150%', '250%'] }}
+          transition={{ 
+            repeat: Infinity, 
+            duration: 3, 
+            repeatDelay: 5, 
+            ease: "easeInOut" 
+          }}
+        />
+
+        {/* Brand Logo (Left) */}
+        <div className="w-1/3 flex justify-start relative z-10">
+          <Link to="/" className="font-heading font-bold text-2xl tracking-tighter text-primary hover:text-accent-red transition-colors">
             NUTROBOT
           </Link>
         </div>
         
-        {/* Desktop Navigation */}
-        <div className="w-1/3 hidden sm:flex justify-center gap-8 font-heading uppercase text-sm font-bold tracking-wider text-primary">
+        {/* Desktop Navigation (Center) */}
+        <div className="w-1/3 hidden sm:flex justify-center gap-8 font-heading uppercase text-sm font-bold tracking-wider text-primary relative z-10">
           {token ? (
             <>
               <Link to="/dashboard" className="hover:text-accent-red transition-colors">Dashboard</Link>
@@ -32,7 +48,8 @@ export const Navbar: React.FC = () => {
           )}
         </div>
 
-        <div className="w-1/3 flex justify-end gap-6 sm:text-primary text-background mix-blend-difference sm:mix-blend-normal items-center">
+        {/* User Profile / Action (Right) */}
+        <div className="w-1/3 flex justify-end gap-6 text-primary items-center relative z-10">
           {/* Desktop User profile */}
           <div className="hidden sm:flex">
             {token ? (
@@ -50,10 +67,10 @@ export const Navbar: React.FC = () => {
           {/* Mobile Menu Toggle */}
           <button 
             onClick={() => setMenuOpen(!menuOpen)}
-            className="sm:hidden text-background mix-blend-difference hover:text-accent-red transition-colors focus:outline-none"
+            className="sm:hidden text-primary hover:text-accent-red transition-colors focus:outline-none"
             aria-label="Toggle menu"
           >
-            {menuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
+            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </nav>
