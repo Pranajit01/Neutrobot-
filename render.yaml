@@ -42,14 +42,12 @@ services:
           type: web
           property: url
 
-# 3. PostgreSQL Database Instance
-databases:
-  - name: nutrobot-db
-    plan: free
-
-# 4. Redis Cache Instance
-services:
+  # 3. Redis Cache Instance
   - type: redis
     name: nutrobot-redis
     plan: free
     ipAllowList: [] # Restricts access to internal services only
+
+databases:
+  - name: nutrobot-db
+    plan: free
